@@ -1,0 +1,109 @@
+import pandas as pd
+
+FILE_NAME = "customers.csv"
+
+# Load data
+def load_data():
+    try:
+        return pd.read_csv(FILE_NAME)
+    except:
+        df = pd.DataFrame(columns=["Customer ID", "Name", "Balance"])
+        df.to_csv(FILE_NAME, index=False)
+        return df
+
+# Save data
+def save_data(df):
+    df.to_csv(FILE_NAME, index=False)
+
+# Add customer
+def add_customer():
+    df = load_data()
+
+    customer_id = int(input("Enter Customer ID: "))
+    name = input("Enter Customer Name: ")
+    balance = float(input("Enter Initial Balance: "))
+
+    new_customer = pd.DataFrame({
+        "Customer ID": [customer_id],
+        "Name": [name],
+        "Balance": [balance]
+    })
+
+    df = pd.concat([df, new_customer], ignore_index=True)
+    save_data(df)
+
+    print("Customer Added Successfully!")
+
+# Credit money
+def credit_money():
+    df = load_data()
+
+    customer_id = int(input("Enter Customer ID: "))
+    amount = float(input("Enter Amount to Credit: "))
+
+    if customer_id in df["Customer ID"].values:
+        df.loc[df["Customer ID"] == customer_id, "Balance"] += amount
+        save_data(df)
+        print("Amount Credited Successfully!")
+    else:
+        print("Customer Not Found!")
+
+# Withdraw money
+def withdraw_money():
+    df = load_data()
+
+    customer_id = int(input("Enter Customer ID: "))
+    amount = float(input("Enter Amount to Withdraw: "))
+
+    if customer_id in df["Customer ID"].values:
+
+        balance = df.loc[df["Customer ID"] == customer_id, "Balance"].values[0]
+
+        if balance >= amount:
+            df.loc[df["Customer ID"] == customer_id, "Balance"] -= amount
+            save_data(df)
+            print("Withdrawal Successful!")
+        else:
+            print("Insufficient Balance!")
+    else:
+        print("Customer Not Found!")
+
+# Display customers
+def display_customers():
+    df = load_data()
+
+    if len(df) == 0:
+        print("No Customers Found!")
+    else:
+        print("\nCustomer Records:")
+        print(df)
+
+# Main Menu
+while True:
+    print("\n===== BANK MANAGEMENT SYSTEM =====")
+    print("1. Add Customer")
+    print("2. Credit Money")
+    print("3. Withdraw Money")
+    print("4. Display Customers")
+    print("5. Exit")
+
+    choice = input("Enter Your Choice: ")
+
+    if choice == "1":
+        add_customer()
+
+    elif choice == "2":
+        credit_money()
+
+    elif choice == "3":
+        withdraw_money()
+
+    elif choice == "4":
+        display_customers()
+
+    elif choice == "5":
+        print("Thank You!")
+        break
+
+    else:
+        print("Invalid Choice!")
